@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="use_simulation" default="false" />
+
+<group if="$(arg use_simulation)">
+<param name="positon_controller_topic" value="/arm_controller/command" />
+ <node name="ur_manager" pkg="ur_interface_pkg" type="ur_manager_node" output="screen">        
+ </node>
+</group>
+
+
+<group unless="$(arg use_simulation)">
+<param name="positon_controller_topic" value="/scaled_pos_joint_traj_controller/command" />
+ <node name="ur_manager" pkg="ur_interface_pkg" type="ur_manager_node" output="screen">        
+ </node>
+</group>
+
+</launch>

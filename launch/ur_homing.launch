@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+
+    <rosparam command="load" file="$(find ur_interface_pkg)/config/homing_conf.yaml"/>
+
+ 	<node name="ur_homing" pkg="ur_interface_pkg" type="ur_homing_node" output="screen"/>        
+</launch> 
