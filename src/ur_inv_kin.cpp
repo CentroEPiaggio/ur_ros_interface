@@ -43,13 +43,6 @@ void state_callback(const sensor_msgs::JointState& msg)
 	if(received_state) return;
     
     // for(int i = 0;i<6;i++)
-		q0.at(0) = (msg.position.at(2));
- 		q0.at(1) = (msg.position.at(1));
-		q0.at(2) = (msg.position.at(0));
-		q0.at(3) = (msg.position.at(3));
-		q0.at(4) = (msg.position.at(4));
-		q0.at(5) = (msg.position.at(5));
-
 		q_(0) = (msg.position.at(2));
  		q_(1) = (msg.position.at(1));
 		q_(2) = (msg.position.at(0));
@@ -83,31 +76,15 @@ void callback_des(const geometry_msgs::Pose& msg)
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "single_ur_homing");
+	ros::init(argc, argv, "ur_inv_kin");
 	ros::NodeHandle n_;
 	double rateHZ = 100;
 	double dt = 1/rateHZ;
-
-	std::vector<double> homing(6);
-    
-    n_.param("homing",homing,homing_default);
-    trajectory_msgs::JointTrajectoryPoint point;
-    point.positions.resize(6);
-
-    trajectory.joint_names.push_back("shoulder_pan_joint");
-    trajectory.joint_names.push_back("shoulder_lift_joint");
-    trajectory.joint_names.push_back("elbow_joint");
-    trajectory.joint_names.push_back("wrist_1_joint");
-    trajectory.joint_names.push_back("wrist_2_joint");
-    trajectory.joint_names.push_back("wrist_3_joint");
-
-    trajectory.points.push_back(point);
 
 	ros::Subscriber sub = n_.subscribe("/joint_states",1,&state_callback);
 	ros::Subscriber sub_pose_d = n_.subscribe("/pose_des",1,&callback_des);
 
 	ros::Publisher pub_command_homing = n_.advertise<std_msgs::Float64MultiArray>("/joint_group_position_controller/command", 1);
-	ros::Publisher pub_command_point = n_.advertise<sensor_msgs::JointState>("/ur_joint_command", 1);
 	pub_current_pose = n_.advertise<geometry_msgs::Pose>("/hand_pose", 1);
 	sensor_msgs::JointState joint_command;
 	joint_command.position.resize(6);
@@ -119,7 +96,7 @@ int main(int argc, char **argv)
    	std::string robot_desc_string;
    	n_.param("robot_description", robot_desc_string, std::string());
    	if (!kdl_parser::treeFromString(robot_desc_string, robot_kin)){
-      ROS_ERROR("Failed to construct kdl tree");
+      ROS_ERROR("Failed to parse kdl tree");
       return false;
    }	
 
@@ -194,6 +171,7 @@ int main(int argc, char **argv)
     
 	while(!received_state && ros::ok())
 	{
+		std::cout<< "Waiting State"<< std::endl;
 		r.sleep();
 		ros::spinOnce();
 	}
@@ -204,10 +182,6 @@ int main(int argc, char **argv)
 	{
 		pos_d_(i) = x_.p(i);
 	}
-
-	std::cout<<"position: "<< pos_d_(0)<<" "<< pos_d_(1)<<" "<<pos_d_(2)<< std::endl;
-
-
 
 
 	for(int i = 0; i < 3 ; i++)
@@ -305,8 +279,8 @@ int main(int argc, char **argv)
 		// std::cout << e_ << "\n" << std::endl;
 
 
-		// if(e_.norm() > 0.03)
-		if(true)
+		if(e_.norm() > 0.01)
+		// if(true)
 		{
 			pseudo_inverse(Jac_ , Jac_pinv_,true);
 		
@@ -319,7 +293,6 @@ int main(int argc, char **argv)
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		for(int i=0; i<6; i++)
 		{
-			// trajectory.points.at(0).positions.at(i) = q_eig_(i);
 			command_array.data.push_back(q_eig_(i));
 			q_(i) = q_eig_(i);
 		}
@@ -327,7 +300,6 @@ int main(int argc, char **argv)
 		joint_command.header.stamp = ros::Time::now();
 
 		pub_command_homing.publish(command_array);
-		// pub_command_point.publish(joint_command);
 
 		    try{
       listener.lookupTransform("base", "hand",  
@@ -349,11 +321,7 @@ int main(int argc, char **argv)
 		r.sleep();
 		ros::spinOnce();
 
-		// alpha+=0.0025;
-		// if(alpha>1) break;
 	}
-
-	std::cout<<"Homing: DONE"<<std::endl;
 
 	return 0;
 }

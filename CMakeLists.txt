@@ -58,3 +58,7 @@ target_link_libraries(ur_inv_kin_node ${catkin_LIBRARIES})
 add_executable(ur_homing_node src/ur_homing.cpp)
 add_dependencies(ur_homing_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ur_homing_node ${catkin_LIBRARIES})
+
+add_executable(ur_manager_group_node src/ur_manager_group_node.cpp src/ur_manager_group.cpp)
+add_dependencies(ur_manager_group_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ur_manager_group_node ${catkin_LIBRARIES})
