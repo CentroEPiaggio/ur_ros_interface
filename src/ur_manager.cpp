@@ -34,7 +34,9 @@ URManager::URManager()
 void URManager::callback_ur_aux(const trajectory_msgs::JointTrajectory& msg)
 {
     trajectory.points.at(0).positions = msg.points.at(0).positions;  
-    trajectory.header.stamp = ros::Time::now();
+    std_msgs::Header empty_header;
+    //trajectory.header.stamp = ros::Time::now();
+    trajectory.header = empty_header;	
     command_publisher.publish(trajectory);
 }
 
