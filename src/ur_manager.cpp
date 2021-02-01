@@ -52,7 +52,9 @@ void URManager::callback_state(const sensor_msgs::JointState& msg)
     trajectory.points.at(0).positions.at(3) = msg.position.at(3);
     trajectory.points.at(0).positions.at(4) = msg.position.at(4);
     trajectory.points.at(0).positions.at(5) = msg.position.at(5);
-    trajectory.header.stamp = ros::Time::now();
+    std_msgs::Header empty_header;
+    //trajectory.header.stamp = ros::Time::now();
+    trajectory.header = empty_header;	
     command_publisher.publish(trajectory);
  
     active = true;
