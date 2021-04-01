@@ -101,7 +101,7 @@ int main(int argc, char **argv)
    }	
 
    KDL::Chain kdl_chain_;
-	if(!robot_kin.getChain("base", "hand", kdl_chain_))
+	if(!robot_kin.getChain("base", "hand", kdl_chain_)) // Check ee frame 
 	{
 		ROS_ERROR("Failed to construct kdl tree");
 		return false;
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
     tf::StampedTransform transform;
     try{
       listener.lookupTransform("base", "hand",  
-                               ros::Time(0), transform);
+                               ros::Time(0), transform); // check ee frame
     }
     catch (tf::TransformException ex){
       ROS_ERROR("%s",ex.what());
