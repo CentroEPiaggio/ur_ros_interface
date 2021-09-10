@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     trajectory.joint_names.push_back("shoulder_lift_joint");
     trajectory.joint_names.push_back("elbow_joint");
     trajectory.joint_names.push_back("wrist_1_joint");
-    trajectory.joint_names.push_back("wrist_3_joint");
+    trajectory.joint_names.push_back("wrist_2_joint");
     trajectory.joint_names.push_back("wrist_3_joint");
 
     trajectory.points.push_back(point);
